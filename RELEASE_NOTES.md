@@ -1,3 +1,15 @@
+## [1.0.0.22] - Hotfix: Bug Traduzione Llama Locale / Local Llama Translation Bug
+
+### 🇮🇹 Italiano
+- **[Bug Fix]** Risolto un problema critico introdotto nell'ultima patch in cui le IA locali (Llama) smettevano di tradurre, causato dal modo in cui il codice lingua "it" veniva interpretato nel prompt come la parola inglese "it" al posto di "Italian".
+
+---
+
+### 🇬🇧 English
+- **[Bug Fix]** Fixed a critical issue introduced in the last patch where local AI models (Llama) completely stopped translating. This was caused by the language code "it" being literally interpreted as the English pronoun "it" in the prompt instead of "Italian".
+
+---
+
 ## [1.0.0.21] - Aggiornamento UI: Menu a tendina per la lingua / UI Update: Language Dropdown
 
 ### 🇮🇹 Italiano

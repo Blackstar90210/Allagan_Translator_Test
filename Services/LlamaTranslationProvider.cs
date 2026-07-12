@@ -79,8 +79,20 @@ namespace AllaganTranslator.Services
             
             try
             {
+                string languageName = targetLanguage.ToLower() switch
+                {
+                    "it" => "Italian",
+                    "es" => "Spanish",
+                    "fr" => "French",
+                    "de" => "German",
+                    "ja" => "Japanese",
+                    "pt" => "Portuguese",
+                    "ru" => "Russian",
+                    _ => targetLanguage
+                };
+
                 // Prompt dinamico con il targetLanguage corretto
-                var prompt = $"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are an expert professional localization translator for Final Fantasy XIV. Translate the following text into {targetLanguage}. Maintain a natural, fluid, and colloquial tone suitable for a fantasy RPG. Do NOT translate idioms literally, adapt them to natural {targetLanguage} equivalents. Output ONLY the final translation without any explanations, quotes, or additional text.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{text}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
+                var prompt = $"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are an expert professional localization translator for Final Fantasy XIV. Translate the following text into {languageName}. Maintain a natural, fluid, and colloquial tone suitable for a fantasy RPG. Do NOT translate idioms literally, adapt them to natural {languageName} equivalents. Output ONLY the final translation without any explanations, quotes, or additional text.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{text}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
                 var inferenceParams = new InferenceParams() { 
                     MaxTokens = 256, 
                     AntiPrompts = new List<string> { "<|eot_id|>" }

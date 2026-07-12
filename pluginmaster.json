@@ -3,8 +3,8 @@
         "Author":  "Blackstar90210",
         "Name":  "Allagan Translator (Local AI \u0026 Online)",
         "InternalName":  "AllaganTranslator",
-        "AssemblyVersion":  "1.0.0.21",
-        "TestingAssemblyVersion":  "1.0.0.21",
+        "AssemblyVersion":  "1.0.0.22",
+        "TestingAssemblyVersion":  "1.0.0.22",
         "Description":  "Offline translation plugin directly inside FFXIV.",
         "ApplicableVersion":  "any",
         "Tags":  [
