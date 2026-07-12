@@ -9,7 +9,7 @@ namespace AllaganTranslator
     {
         GoogleCloudFree,
         LocalLlama3B_CPU,
-        LocalLlama8B_GPU
+        LocalLlama8B_CPU
     }
 
     [Serializable]

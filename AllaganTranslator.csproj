@@ -46,7 +46,6 @@
     <PackageReference Include="DalamudPackager" Version="11.0.0" />
     <PackageReference Include="LLamaSharp" Version="*" />
     <PackageReference Include="LLamaSharp.Backend.Cpu" Version="*" />
-    <PackageReference Include="LLamaSharp.Backend.Vulkan" Version="*" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="images\icon.png">

@@ -28,6 +28,12 @@ namespace AllaganTranslator.Services
         public bool IsReady => this.currentProvider?.IsReady ?? false;
         public bool IsDownloading => this.llamaProvider.IsDownloading;
 
+        public bool IsCurrentModelDownloaded()
+        {
+            if (this.configuration.TranslationEngine == TranslationEngineType.GoogleCloudFree) return true;
+            return this.llamaProvider.IsModelDownloaded;
+        }
+
         public event Action<TranslationMessage>? OnTranslationFinished;
         
         public event Action<float>? OnDownloadProgress
@@ -55,7 +61,7 @@ namespace AllaganTranslator.Services
             this.log.Information("[TranslationManager] Inizializzato.");
         }
 
-        public async Task InitializeModelAsync()
+        public async Task InitializeModelAsync(bool forceDownload = false)
         {
             if (this.configuration.TranslationEngine == TranslationEngineType.GoogleCloudFree)
             {
@@ -68,6 +74,12 @@ namespace AllaganTranslator.Services
 
             if (this.currentProvider != null && !this.currentProvider.IsReady)
             {
+                if (this.currentProvider == this.llamaProvider && !this.llamaProvider.IsModelDownloaded && !forceDownload)
+                {
+                    // Non inizializziamo (e non scarichiamo) finché l'utente non lo richiede esplicitamente
+                    return;
+                }
+
                 await this.currentProvider.InitializeAsync(this.cancellationTokenSource.Token);
             }
         }

@@ -26,13 +26,13 @@ namespace AllaganTranslator.Services
             this.pluginDirectory = pluginDirectory;
         }
 
-        public void SetupNativePaths(bool useGpu)
+        public void SetupNativePaths()
         {
             try 
             {
                 if (!string.IsNullOrEmpty(pluginDirectory))
                 {
-                    var backendFolder = useGpu ? "vulkan" : "avx2";
+                    var backendFolder = "avx2";
                     var nativeDir = Path.Combine(pluginDirectory, "runtimes", "win-x64", "native", backendFolder);
                     
                     var currentPath = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
@@ -55,12 +55,20 @@ namespace AllaganTranslator.Services
             });
         }
 
-        public async Task<string> EnsureModelDownloadedAsync(bool useGpu, CancellationToken token = default)
+        public bool IsModelDownloaded(bool is8BModel)
         {
-            var modelName = useGpu ? "llama_3.1_8b_model.gguf" : "llama_3.2_3b_model.gguf";
+            var modelName = is8BModel ? "llama_3.1_8b_model.gguf" : "llama_3.2_3b_model.gguf";
+            var modelPath = Path.Combine(this.configDirectory, modelName);
+            var expectedMinSize = is8BModel ? 4_000_000_000L : 1_500_000_000L;
+            return File.Exists(modelPath) && new FileInfo(modelPath).Length >= expectedMinSize;
+        }
+
+        public async Task<string> EnsureModelDownloadedAsync(bool is8BModel, CancellationToken token = default)
+        {
+            var modelName = is8BModel ? "llama_3.1_8b_model.gguf" : "llama_3.2_3b_model.gguf";
             var modelPath = Path.Combine(this.configDirectory, modelName);
             
-            var expectedMinSize = useGpu ? 4_000_000_000L : 1_500_000_000L;
+            var expectedMinSize = is8BModel ? 4_000_000_000L : 1_500_000_000L;
             if (File.Exists(modelPath) && new FileInfo(modelPath).Length < expectedMinSize)
             {
                 this.log.Information("Rilevato file del modello corrotto o parziale. Eliminazione in corso...");
@@ -70,7 +78,7 @@ namespace AllaganTranslator.Services
             if (!File.Exists(modelPath))
             {
                 var tmpPath = modelPath + ".tmp";
-                await DownloadModelAsync(tmpPath, useGpu, token);
+                await DownloadModelAsync(tmpPath, is8BModel, token);
                 
                 if (File.Exists(tmpPath))
                 {
@@ -84,18 +92,18 @@ namespace AllaganTranslator.Services
             return modelPath;
         }
 
-        private async Task DownloadModelAsync(string destPath, bool useGpu, CancellationToken token)
+        private async Task DownloadModelAsync(string destPath, bool is8BModel, CancellationToken token)
         {
             this.IsDownloading = true;
             this.log.Information("[ModelManager] Download del modello linguistico iniziato...");
             
-            var modelUrl = useGpu ? ModelUrl8B : ModelUrl3B;
+            var modelUrl = is8BModel ? ModelUrl8B : ModelUrl3B;
             try
             {
                 using var client = new HttpClient();
                 using var response = await client.GetAsync(modelUrl, HttpCompletionOption.ResponseHeadersRead, token);
                 response.EnsureSuccessStatusCode();
-                var fallbackSize = useGpu ? 4920000000L : 2142277888L;
+                var fallbackSize = is8BModel ? 4920000000L : 2142277888L;
                 var totalBytes = response.Content.Headers.ContentLength ?? fallbackSize;
                 
                 using var contentStream = await response.Content.ReadAsStreamAsync(token);

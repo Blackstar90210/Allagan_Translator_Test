@@ -20,6 +20,7 @@ namespace AllaganTranslator.Services
 
         public bool IsReady { get; private set; } = false;
         public bool IsDownloading => this.modelManager.IsDownloading;
+        public bool IsModelDownloaded => this.modelManager.IsModelDownloaded(this.configuration.TranslationEngine == TranslationEngineType.LocalLlama8B_CPU);
 
         public event Action<float>? OnDownloadProgress
         {
@@ -38,15 +39,15 @@ namespace AllaganTranslator.Services
         {
             try
             {
-                bool useGpu = this.configuration.TranslationEngine == TranslationEngineType.LocalLlama8B_GPU;
-                this.modelManager.SetupNativePaths(useGpu);
-                var modelPath = await this.modelManager.EnsureModelDownloadedAsync(useGpu, token);
+                bool is8BModel = this.configuration.TranslationEngine == TranslationEngineType.LocalLlama8B_CPU;
+                this.modelManager.SetupNativePaths();
+                var modelPath = await this.modelManager.EnsureModelDownloadedAsync(is8BModel, token);
 
                 this.log.Information("Inizializzazione modello Llama in memoria...");
                 var parameters = new ModelParams(modelPath)
                 {
                     ContextSize = 1024,
-                    GpuLayerCount = useGpu ? 99 : 0
+                    GpuLayerCount = 0
                 };
                 
                 this.model = LLamaWeights.LoadFromFile(parameters);

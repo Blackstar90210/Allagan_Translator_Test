@@ -39,15 +39,6 @@ if (Test-Path $outputZip) {
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $zip = [System.IO.Compression.ZipFile]::Open($outputZip, 'Update')
     [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, "icon.png", "images/icon.png")
-    
-    $vulkanDir = "bin\Release\runtimes\win-x64\native\vulkan"
-    if (Test-Path $vulkanDir) {
-        Get-ChildItem $vulkanDir | ForEach-Object {
-            $entryName = "runtimes/win-x64/native/vulkan/" + $_.Name
-            [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $_.FullName, $entryName)
-        }
-    }
-    
     $zip.Dispose()
 
     Copy-Item -Path $outputZip -Destination "latest_test.zip" -Force
