@@ -1,3 +1,15 @@
+## [1.0.0.20] - Bug Fix: Download Modelli Multipli
+
+### 🇮🇹 Italiano
+- **[Bug Fix]** Risolto un problema critico che impediva il download del secondo modello se ne era già stato scaricato un altro in precedenza. (Il pulsante "Avvia Download Modello" falliva silenziosamente a causa di un'eccezione nella registrazione dei log nativi).
+
+---
+
+### 🇬🇧 English
+- **[Bug Fix]** Fixed a critical issue preventing the download of the second model if another model had already been downloaded. (The "Start Model Download" button would silently fail due to an exception during native log registration).
+
+---
+
 ## [1.0.0.18] - Refactoring Modelli & Download
 
 ### 🇮🇹 Italiano

@@ -26,8 +26,12 @@ namespace AllaganTranslator.Services
             this.pluginDirectory = pluginDirectory;
         }
 
+        private bool isNativePathsSetup = false;
+
         public void SetupNativePaths()
         {
+            if (this.isNativePathsSetup) return;
+
             try 
             {
                 if (!string.IsNullOrEmpty(pluginDirectory))
@@ -50,9 +54,18 @@ namespace AllaganTranslator.Services
                 this.log.Error(ex, "Impossibile impostare la directory nativa per LLamaSharp.");
             }
 
-            NativeLibraryConfig.All.WithLogCallback(delegate(LLamaLogLevel level, string message) {
-                // Disable verbose C++ logs
-            });
+            try
+            {
+                NativeLibraryConfig.All.WithLogCallback(delegate(LLamaLogLevel level, string message) {
+                    // Disable verbose C++ logs
+                });
+            }
+            catch (Exception ex)
+            {
+                this.log.Warning(ex, "Impossibile impostare il log callback per LLamaSharp (potrebbe essere già impostato).");
+            }
+
+            this.isNativePathsSetup = true;
         }
 
         public bool IsModelDownloaded(bool is8BModel)
