@@ -43,7 +43,7 @@ namespace AllaganTranslator.Services
                 var parameters = new ModelParams(modelPath)
                 {
                     ContextSize = 1024,
-                    GpuLayerCount = 0 // CPU by default
+                    GpuLayerCount = 99 // Offload as many layers to GPU as possible per migliori prestazioni
                 };
                 
                 this.model = LLamaWeights.LoadFromFile(parameters);
@@ -69,8 +69,11 @@ namespace AllaganTranslator.Services
             try
             {
                 // In un futuro si potrebbe rendere dinamica la lingua target nel prompt
-                var prompt = $"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are a professional localization translator for Final Fantasy XIV. Translate the following text into Italian. Output only the Italian translation, nothing else.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{text}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
-                var inferenceParams = new InferenceParams() { MaxTokens = 256, AntiPrompts = new List<string> { "<|eot_id|>" } };
+                var prompt = $"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are an expert professional localization translator for Final Fantasy XIV. Translate the following text into Italian. Maintain a natural, fluid, and colloquial tone suitable for a fantasy RPG. Do NOT translate idioms literally, adapt them to natural Italian equivalents. Output ONLY the final Italian translation without any explanations, quotes, or additional text.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{text}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
+                var inferenceParams = new InferenceParams() { 
+                    MaxTokens = 256, 
+                    AntiPrompts = new List<string> { "<|eot_id|>" }
+                };
 
                 string translatedText = "";
                 await foreach (var tokenText in this.executor.InferAsync(prompt, inferenceParams, token))

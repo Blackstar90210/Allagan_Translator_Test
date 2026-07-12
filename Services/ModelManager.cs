@@ -13,7 +13,7 @@ namespace AllaganTranslator.Services
         private readonly IPluginLog log;
         private readonly string configDirectory;
         private readonly string pluginDirectory;
-        private const string ModelUrl = "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf";
+        private const string ModelUrl = "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf";
 
         public event Action<float>? OnDownloadProgress;
         public bool IsDownloading { get; private set; } = false;
@@ -55,9 +55,9 @@ namespace AllaganTranslator.Services
 
         public async Task<string> EnsureModelDownloadedAsync(CancellationToken token = default)
         {
-            var modelPath = Path.Combine(this.configDirectory, "llama_3.2_3b_model.gguf");
+            var modelPath = Path.Combine(this.configDirectory, "llama_3.1_8b_model.gguf");
             
-            if (File.Exists(modelPath) && new FileInfo(modelPath).Length < 1_500_000_000)
+            if (File.Exists(modelPath) && new FileInfo(modelPath).Length < 4_000_000_000)
             {
                 this.log.Information("Rilevato file del modello corrotto o parziale. Eliminazione in corso...");
                 File.Delete(modelPath);
@@ -90,7 +90,7 @@ namespace AllaganTranslator.Services
                 using var client = new HttpClient();
                 using var response = await client.GetAsync(ModelUrl, HttpCompletionOption.ResponseHeadersRead, token);
                 response.EnsureSuccessStatusCode();
-                var totalBytes = response.Content.Headers.ContentLength ?? 2142277888L;
+                var totalBytes = response.Content.Headers.ContentLength ?? 4920000000L;
                 
                 using var contentStream = await response.Content.ReadAsStreamAsync(token);
                 using var fileStream = new FileStream(destPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);

@@ -49,7 +49,7 @@ namespace AllaganTranslator.Windows
             ImGui.Text("Motore di Traduzione:");
             
             var currentEngine = (int)this.configuration.TranslationEngine;
-            var engineNames = new[] { "Google Translate API (Cloud, Gratis)", "Llama 3.2 3B (Locale, CPU)" };
+            var engineNames = new[] { "Google Translate API (Cloud, Gratis)", "Llama 3.1 8B (Locale, GPU)" };
             if (ImGui.Combo("##EngineCombo", ref currentEngine, engineNames, engineNames.Length))
             {
                 this.configuration.TranslationEngine = (TranslationEngineType)currentEngine;
@@ -160,11 +160,11 @@ namespace AllaganTranslator.Windows
 
             if (this.configuration.TranslationEngine == TranslationEngineType.LocalLlamaVulkan)
             {
-                ImGui.Text("Stato Motore di Traduzione (Llama 3.2 3B - CPU):");
+                ImGui.Text("Stato Motore di Traduzione (Llama 3.1 8B - GPU):");
                 
                 if (this.translationManager.IsDownloading)
                 {
-                    ImGui.TextColored(new Vector4(1, 1, 0, 1), "Scaricamento in corso (Circa 2 GB)...");
+                    ImGui.TextColored(new Vector4(1, 1, 0, 1), "Scaricamento in corso (Circa 4.9 GB)...");
                     ImGui.ProgressBar(this.downloadProgress, new Vector2(-1, 0));
                 }
                 else if (this.translationManager.IsReady)
