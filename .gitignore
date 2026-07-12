@@ -6,3 +6,4 @@ obj/
 *.docstates
 .vs/
 *.zip
+.agents/
