@@ -13,7 +13,8 @@ namespace AllaganTranslator.Services
         private readonly IPluginLog log;
         private readonly string configDirectory;
         private readonly string pluginDirectory;
-        private const string ModelUrl = "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf";
+        private const string ModelUrl3B = "https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf";
+        private const string ModelUrl8B = "https://huggingface.co/bartowski/Meta-Llama-3.1-8B-Instruct-GGUF/resolve/main/Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf";
 
         public event Action<float>? OnDownloadProgress;
         public bool IsDownloading { get; private set; } = false;
@@ -25,13 +26,14 @@ namespace AllaganTranslator.Services
             this.pluginDirectory = pluginDirectory;
         }
 
-        public void SetupNativePaths()
+        public void SetupNativePaths(bool useGpu)
         {
             try 
             {
                 if (!string.IsNullOrEmpty(pluginDirectory))
                 {
-                    var nativeDir = Path.Combine(pluginDirectory, "runtimes", "win-x64", "native", "avx2");
+                    var backendFolder = useGpu ? "vulkan" : "avx2";
+                    var nativeDir = Path.Combine(pluginDirectory, "runtimes", "win-x64", "native", backendFolder);
                     
                     var currentPath = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
                     if (!currentPath.Contains(nativeDir))
@@ -53,11 +55,13 @@ namespace AllaganTranslator.Services
             });
         }
 
-        public async Task<string> EnsureModelDownloadedAsync(CancellationToken token = default)
+        public async Task<string> EnsureModelDownloadedAsync(bool useGpu, CancellationToken token = default)
         {
-            var modelPath = Path.Combine(this.configDirectory, "llama_3.1_8b_model.gguf");
+            var modelName = useGpu ? "llama_3.1_8b_model.gguf" : "llama_3.2_3b_model.gguf";
+            var modelPath = Path.Combine(this.configDirectory, modelName);
             
-            if (File.Exists(modelPath) && new FileInfo(modelPath).Length < 4_000_000_000)
+            var expectedMinSize = useGpu ? 4_000_000_000L : 1_500_000_000L;
+            if (File.Exists(modelPath) && new FileInfo(modelPath).Length < expectedMinSize)
             {
                 this.log.Information("Rilevato file del modello corrotto o parziale. Eliminazione in corso...");
                 File.Delete(modelPath);
@@ -66,7 +70,7 @@ namespace AllaganTranslator.Services
             if (!File.Exists(modelPath))
             {
                 var tmpPath = modelPath + ".tmp";
-                await DownloadModelAsync(tmpPath, token);
+                await DownloadModelAsync(tmpPath, useGpu, token);
                 
                 if (File.Exists(tmpPath))
                 {
@@ -80,17 +84,19 @@ namespace AllaganTranslator.Services
             return modelPath;
         }
 
-        private async Task DownloadModelAsync(string destPath, CancellationToken token)
+        private async Task DownloadModelAsync(string destPath, bool useGpu, CancellationToken token)
         {
             this.IsDownloading = true;
             this.log.Information("[ModelManager] Download del modello linguistico iniziato...");
             
+            var modelUrl = useGpu ? ModelUrl8B : ModelUrl3B;
             try
             {
                 using var client = new HttpClient();
-                using var response = await client.GetAsync(ModelUrl, HttpCompletionOption.ResponseHeadersRead, token);
+                using var response = await client.GetAsync(modelUrl, HttpCompletionOption.ResponseHeadersRead, token);
                 response.EnsureSuccessStatusCode();
-                var totalBytes = response.Content.Headers.ContentLength ?? 4920000000L;
+                var fallbackSize = useGpu ? 4920000000L : 2142277888L;
+                var totalBytes = response.Content.Headers.ContentLength ?? fallbackSize;
                 
                 using var contentStream = await response.Content.ReadAsStreamAsync(token);
                 using var fileStream = new FileStream(destPath, FileMode.Create, FileAccess.Write, FileShare.None, 8192, true);

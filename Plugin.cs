@@ -36,7 +36,7 @@ namespace AllaganTranslator
 
             this.modelManager = new ModelManager(Log, PluginInterface.ConfigDirectory.FullName, PluginInterface.AssemblyLocation.DirectoryName!);
             this.googleProvider = new GoogleTranslationProvider(Log);
-            this.llamaProvider = new LlamaTranslationProvider(Log, this.modelManager);
+            this.llamaProvider = new LlamaTranslationProvider(Log, this.modelManager, this.Configuration);
 
             this.translationManager = new TranslationManager(Log, DataManager, this.Configuration, this.googleProvider, this.llamaProvider);
             

@@ -61,7 +61,8 @@ namespace AllaganTranslator.Services
             {
                 this.currentProvider = this.googleProvider;
             }
-            else
+            else if (this.configuration.TranslationEngine == TranslationEngineType.LocalLlama3B_CPU || 
+                     this.configuration.TranslationEngine == TranslationEngineType.LocalLlama8B_GPU)
             {
                 this.currentProvider = this.llamaProvider;
             }

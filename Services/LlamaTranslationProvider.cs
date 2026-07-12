@@ -12,6 +12,7 @@ namespace AllaganTranslator.Services
     {
         private readonly IPluginLog log;
         private readonly ModelManager modelManager;
+        private readonly Configuration configuration;
 
         private LLamaWeights? model;
         private LLamaContext? context;
@@ -26,24 +27,26 @@ namespace AllaganTranslator.Services
             remove => this.modelManager.OnDownloadProgress -= value;
         }
 
-        public LlamaTranslationProvider(IPluginLog log, ModelManager modelManager)
+        public LlamaTranslationProvider(IPluginLog log, ModelManager modelManager, Configuration configuration)
         {
             this.log = log;
             this.modelManager = modelManager;
+            this.configuration = configuration;
         }
 
         public async Task InitializeAsync(CancellationToken token = default)
         {
             try
             {
-                this.modelManager.SetupNativePaths();
-                var modelPath = await this.modelManager.EnsureModelDownloadedAsync(token);
+                bool useGpu = this.configuration.TranslationEngine == TranslationEngineType.LocalLlama8B_GPU;
+                this.modelManager.SetupNativePaths(useGpu);
+                var modelPath = await this.modelManager.EnsureModelDownloadedAsync(useGpu, token);
 
                 this.log.Information("Inizializzazione modello Llama in memoria...");
                 var parameters = new ModelParams(modelPath)
                 {
                     ContextSize = 1024,
-                    GpuLayerCount = 99 // Offload as many layers to GPU as possible per migliori prestazioni
+                    GpuLayerCount = useGpu ? 99 : 0
                 };
                 
                 this.model = LLamaWeights.LoadFromFile(parameters);

@@ -49,7 +49,7 @@ namespace AllaganTranslator.Windows
             ImGui.Text("Motore di Traduzione:");
             
             var currentEngine = (int)this.configuration.TranslationEngine;
-            var engineNames = new[] { "Google Translate API (Cloud, Gratis)", "Llama 3.1 8B (Locale, GPU)" };
+            var engineNames = new[] { "Google Translate API (Cloud, Gratis)", "Llama 3.2 3B (Locale, CPU)", "Llama 3.1 8B (Locale, GPU)" };
             if (ImGui.Combo("##EngineCombo", ref currentEngine, engineNames, engineNames.Length))
             {
                 this.configuration.TranslationEngine = (TranslationEngineType)currentEngine;
@@ -57,10 +57,11 @@ namespace AllaganTranslator.Windows
                 _ = this.translationManager.InitializeModelAsync();
             }
 
-            if (this.configuration.TranslationEngine == TranslationEngineType.LocalLlamaVulkan)
+            if (this.configuration.TranslationEngine == TranslationEngineType.LocalLlama3B_CPU ||
+                this.configuration.TranslationEngine == TranslationEngineType.LocalLlama8B_GPU)
             {
                 ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(0.7f, 0.7f, 0.7f, 1.0f));
-                ImGui.TextWrapped("Nota: l'IA locale elabora il testo sul tuo PC. La traduzione potrebbe richiedere qualche istante e la sua velocità dipende esclusivamente dalla potenza del tuo processore.");
+                ImGui.TextWrapped("Nota: l'IA locale elabora il testo sul tuo PC. La traduzione potrebbe richiedere qualche istante e la sua velocità dipende esclusivamente dalla potenza del tuo hardware.");
                 ImGui.PopStyleColor();
             }
 
@@ -158,13 +159,16 @@ namespace AllaganTranslator.Windows
             ImGui.Spacing();
             ImGui.Separator();
 
-            if (this.configuration.TranslationEngine == TranslationEngineType.LocalLlamaVulkan)
+            if (this.configuration.TranslationEngine == TranslationEngineType.LocalLlama3B_CPU || 
+                this.configuration.TranslationEngine == TranslationEngineType.LocalLlama8B_GPU)
             {
-                ImGui.Text("Stato Motore di Traduzione (Llama 3.1 8B - GPU):");
+                bool isGpu = this.configuration.TranslationEngine == TranslationEngineType.LocalLlama8B_GPU;
+                ImGui.Text(isGpu ? "Stato Motore di Traduzione (Llama 3.1 8B - GPU):" : "Stato Motore di Traduzione (Llama 3.2 3B - CPU):");
                 
                 if (this.translationManager.IsDownloading)
                 {
-                    ImGui.TextColored(new Vector4(1, 1, 0, 1), "Scaricamento in corso (Circa 4.9 GB)...");
+                    string sizeStr = isGpu ? "4.9 GB" : "2 GB";
+                    ImGui.TextColored(new Vector4(1, 1, 0, 1), $"Scaricamento in corso (Circa {sizeStr})...");
                     ImGui.ProgressBar(this.downloadProgress, new Vector2(-1, 0));
                 }
                 else if (this.translationManager.IsReady)
