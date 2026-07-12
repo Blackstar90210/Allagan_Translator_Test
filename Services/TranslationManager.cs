@@ -61,8 +61,7 @@ namespace AllaganTranslator.Services
             {
                 this.currentProvider = this.googleProvider;
             }
-            else if (this.configuration.TranslationEngine == TranslationEngineType.LocalLlama3B_CPU || 
-                     this.configuration.TranslationEngine == TranslationEngineType.LocalLlama8B_GPU)
+            else
             {
                 this.currentProvider = this.llamaProvider;
             }
@@ -131,7 +130,7 @@ namespace AllaganTranslator.Services
 
                     var urlRegex = new Regex(@"(http[s]?://\S+|www\.\S+|\w+\.\w+/\S+)", RegexOptions.IgnoreCase);
                     textToTranslate = urlRegex.Replace(textToTranslate, m => {
-                        string ph = $"PH{pIndex++}";
+                        string ph = $"___PH{pIndex++}___";
                         placeholders[ph] = m.Value;
                         return ph;
                     });
@@ -141,7 +140,7 @@ namespace AllaganTranslator.Services
                     {
                         var regex = new Regex($@"\b{Regex.Escape(rule.Key)}\b", RegexOptions.IgnoreCase);
                         textToTranslate = regex.Replace(textToTranslate, m => {
-                            string ph = $"PH{pIndex++}";
+                            string ph = $"___PH{pIndex++}___";
                             placeholders[ph] = rule.Value;
                             return ph;
                         });
@@ -152,7 +151,7 @@ namespace AllaganTranslator.Services
                     {
                         var regex = new Regex($@"\b{Regex.Escape(term)}\b", RegexOptions.IgnoreCase);
                         textToTranslate = regex.Replace(textToTranslate, m => {
-                            string ph = $"PH{pIndex++}";
+                            string ph = $"___PH{pIndex++}___";
                             placeholders[ph] = m.Value;
                             return ph;
                         });
@@ -171,7 +170,7 @@ namespace AllaganTranslator.Services
                         translatedText = await this.currentProvider.TranslateAsync(textToTranslate, this.configuration.TargetLanguage, this.cancellationTokenSource.Token);
                     }
 
-                    translatedText = Regex.Replace(translatedText, @"\bPH\s*(\d+)\b", "PH$1", RegexOptions.IgnoreCase);
+                    translatedText = Regex.Replace(translatedText, @"_*\s*PH\s*(\d+)\s*_*", "___PH$1___", RegexOptions.IgnoreCase);
                     foreach (var kvp in placeholders)
                     {
                         translatedText = translatedText.Replace(kvp.Key, kvp.Value);
