@@ -17,8 +17,9 @@ namespace AllaganTranslator.Services
         private LLamaWeights? model;
         private LLamaContext? context;
         private InstructExecutor? executor;
+        private TranslationEngineType? loadedEngineType;
 
-        public bool IsReady { get; private set; } = false;
+        public bool IsReady => this.executor != null && this.loadedEngineType == this.configuration.TranslationEngine;
         public bool IsDownloading => this.modelManager.IsDownloading;
         public bool IsModelDownloaded => this.modelManager.IsModelDownloaded(this.configuration.TranslationEngine == TranslationEngineType.LocalLlama8B_CPU);
 
@@ -39,6 +40,11 @@ namespace AllaganTranslator.Services
         {
             try
             {
+                if (this.executor != null)
+                {
+                    this.Dispose();
+                }
+
                 bool is8BModel = this.configuration.TranslationEngine == TranslationEngineType.LocalLlama8B_CPU;
                 this.modelManager.SetupNativePaths();
                 var modelPath = await this.modelManager.EnsureModelDownloadedAsync(is8BModel, token);
@@ -53,8 +59,8 @@ namespace AllaganTranslator.Services
                 this.model = LLamaWeights.LoadFromFile(parameters);
                 this.context = this.model.CreateContext(parameters);
                 this.executor = new InstructExecutor(this.context);
+                this.loadedEngineType = this.configuration.TranslationEngine;
                 
-                this.IsReady = true;
                 this.log.Information("[LlamaTranslationProvider] Modello caricato e pronto all'uso!");
             }
             catch (Exception ex)
@@ -102,6 +108,7 @@ namespace AllaganTranslator.Services
             this.executor = null;
             this.context?.Dispose();
             this.model?.Dispose();
+            this.loadedEngineType = null;
         }
     }
 }
