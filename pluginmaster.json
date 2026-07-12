@@ -4,7 +4,7 @@
         "Name":  "Allagan Translator (Local AI \u0026 Online)",
         "InternalName":  "AllaganTranslator",
         "AssemblyVersion":  "1.0.0.8",
-        "TestingAssemblyVersion":  "1.0.0.10",
+        "TestingAssemblyVersion":  "1.0.0.16",
         "Description":  "Offline translation plugin directly inside FFXIV.",
         "ApplicableVersion":  "any",
         "Tags":  [
@@ -28,4 +28,3 @@
         "RepoUrl":  "https://github.com/Blackstar90210/Allagan_Translator_Test"
     }
 ]
-
