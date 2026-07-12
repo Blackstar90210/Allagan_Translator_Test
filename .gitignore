@@ -1,0 +1,8 @@
+bin/
+obj/
+*.user
+*.userprefs
+*.suo
+*.docstates
+.vs/
+*.zip

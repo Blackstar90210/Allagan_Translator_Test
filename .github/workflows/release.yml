@@ -1,0 +1,46 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - 'v*' # Si attiva solo quando invii un tag che inizia con "v" (es. v1.0.0.7)
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: windows-latest
+    permissions:
+      contents: write # Serve il permesso per scrivere la release
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+          
+      - name: Setup Dalamud
+        uses: goatcorp/setup-dalamud@v3
+        with:
+          dalamud-release: latest
+          
+      - name: Build Plugin
+        run: dotnet build -c Release
+        
+      - name: Pack Latest Zip
+        run: |
+          Copy-Item "bin/Release/AllaganTranslator/latest.zip" "latest.zip" -Force
+          # Inietta l'icona
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $zip = [System.IO.Compression.ZipFile]::Open("latest.zip", 'Update')
+          [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, "images/icon.png", "icon.png")
+          $zip.Dispose()
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: latest.zip
+          body_path: RELEASE_NOTES.md
+          generate_release_notes: true
