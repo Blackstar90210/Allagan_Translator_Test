@@ -4,6 +4,7 @@ using Dalamud.Plugin;
 using Dalamud.Plugin.Services;
 using Dalamud.Game.Command;
 using AllaganTranslator.Services;
+using AllaganTranslator.Windows;
 
 namespace AllaganTranslator
 {

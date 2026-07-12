@@ -1,9 +1,9 @@
 using System;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin;
-using AllaganTranslator.Windows;
+using AllaganTranslator.Services;
 
-namespace AllaganTranslator.Services
+namespace AllaganTranslator.Windows
 {
     public class WindowManager : IDisposable
     {
