@@ -1,3 +1,17 @@
+## [1.0.0.21] - Aggiornamento UI: Menu a tendina per la lingua / UI Update: Language Dropdown
+
+### 🇮🇹 Italiano
+- **[UI]** Sostituita la casella di testo "Lingua di destinazione" con un comodo menu a tendina.
+- **[UI]** Impostata l'opzione "Italiana" come predefinita.
+
+---
+
+### 🇬🇧 English
+- **[UI]** Replaced the "Target Language" text box with a convenient dropdown menu.
+- **[UI]** Set the "Italiana" option as default.
+
+---
+
 ## [1.0.0.20] - Bug Fix: Download Modelli Multipli
 
 ### 🇮🇹 Italiano

@@ -37,10 +37,15 @@ namespace AllaganTranslator.Windows
             ImGui.Separator();
             ImGui.Spacing();
 
-            var targetLanguage = this.configuration.TargetLanguage;
-            if (ImGui.InputText("Lingua di destinazione", ref targetLanguage, 10))
+            var languages = new[] { "Italiana" };
+            var languageCodes = new[] { "it" };
+            
+            int currentLanguageIndex = Array.IndexOf(languageCodes, this.configuration.TargetLanguage);
+            if (currentLanguageIndex < 0) currentLanguageIndex = 0;
+
+            if (ImGui.Combo("Lingua di destinazione", ref currentLanguageIndex, languages, languages.Length))
             {
-                this.configuration.TargetLanguage = targetLanguage;
+                this.configuration.TargetLanguage = languageCodes[currentLanguageIndex];
                 this.configuration.Save();
             }
 
