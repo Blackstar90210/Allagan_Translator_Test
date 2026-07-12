@@ -1,5 +1,11 @@
-* **[Feature]** Integrato il supporto alla traduzione tramite **GPU (Scheda Video)** sfruttando Vulkan (AMD/NVIDIA). Elimina il carico sul processore e azzera i tempi di attesa.
-* **[Feature]** Aggiunto il possente modello **Meta Llama 3.1 8B** (su GPU) per traduzioni colloquiali, precise e capaci di comprendere finalmente i modi di dire.
+## [1.0.0.17] - Refactoring Modelli & Download
+- Rimosso completamente il supporto GPU/Vulkan a causa di instabilità con Dalamud
+- Declassato il modello Llama 3.1 8B a esecuzione esclusivamente CPU (AVX2)
+- Implementato un sistema di avvisi esplicito sul peso computazionale del modello 8B
+- Aggiunto il download manuale del modello: i file non verranno più scaricati in background all'avvio, ma richiederanno l'azione esplicita dell'utente
+- Corretto bug logico che impediva il corretto caricamento di un nuovo modello se ne era già stato caricato uno in precedenza.
+- Ottimizzate le dimensioni del file `.zip` (librerie Vulkan scartate). 
+
 * **[Feature]** Mantenuto il modello leggero **Llama 3.2 3B** (su CPU) per computer meno performanti.
 * **[Miglioramento]** Nuove opzioni nel menù per lo switch a caldo tra IA Cloud, IA Locale CPU o IA Locale GPU.
 * **[Miglioramento]** Parametri di generazione ("Temperature" e "Top-P") ottimizzati per impedire all'IA di "inventare" frasi non presenti nell'originale.

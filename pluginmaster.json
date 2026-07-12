@@ -22,7 +22,7 @@
         "Punchline":  "Translate FFXIV natively and offline!",
         "AcceptsFeedback":  true,
         "DownloadLinkInstall":  "https://github.com/Blackstar90210/Allagan_Translator_Test/releases/latest/download/latest.zip",
-        "DownloadLinkTesting":  "https://raw.githubusercontent.com/Blackstar90210/Allagan_Translator_Test/main/latest_test.zip",
+        "DownloadLinkTesting":  "https://github.com/Blackstar90210/Allagan_Translator_Test/releases/latest/download/latest_test.zip",
         "DownloadLinkUpdate":  "https://github.com/Blackstar90210/Allagan_Translator_Test/releases/latest/download/latest.zip",
         "IconUrl":  "https://raw.githubusercontent.com/Blackstar90210/Allagan_Translator_Test/main/icon.png",
         "RepoUrl":  "https://github.com/Blackstar90210/Allagan_Translator_Test"
