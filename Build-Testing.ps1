@@ -35,7 +35,7 @@ dotnet build -c Release
 # 3. Genera latest_test.zip
 $outputZip = "bin\Release\AllaganTranslator\latest.zip"
 if (Test-Path $outputZip) {
-    Write-Host "Aggiunta icona e librerie Vulkan al pacchetto zip..."
+    Write-Host "Aggiunta icona al pacchetto zip..."
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     $zip = [System.IO.Compression.ZipFile]::Open($outputZip, 'Update')
     [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, "icon.png", "images/icon.png")

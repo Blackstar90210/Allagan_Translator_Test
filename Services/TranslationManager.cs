@@ -20,6 +20,10 @@ namespace AllaganTranslator.Services
         private readonly Task workerTask;
         private readonly Dictionary<string, string> translationCache = new();
         private readonly HashSet<string> luminaContextTerms = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        
+        private static readonly Regex urlRegex = new Regex(@"(http[s]?://\S+|www\.\S+|\w+\.\w+/\S+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private readonly Dictionary<string, Regex> luminaRegexCache = new Dictionary<string, Regex>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, Regex> glossaryRegexCache = new Dictionary<string, Regex>(StringComparer.OrdinalIgnoreCase);
 
         private ITranslationProvider? currentProvider;
         private readonly GoogleTranslationProvider googleProvider;
@@ -120,7 +124,11 @@ namespace AllaganTranslator.Services
         public void EnqueueTranslation(TranslationMessage message)
         {
             if (string.IsNullOrWhiteSpace(message.Text)) return;
-            if (this.currentProvider == null || !this.currentProvider.IsReady) return;
+            if (this.currentProvider == null || !this.currentProvider.IsReady)
+            {
+                this.log.Warning($"[TranslationManager] Modello non pronto. Messaggio ignorato: {message.Text}");
+                return;
+            }
 
             if (!this.translationQueue.IsAddingCompleted)
             {
@@ -140,7 +148,6 @@ namespace AllaganTranslator.Services
                     int pIndex = 0;
                     string textToTranslate = msg.Text;
 
-                    var urlRegex = new Regex(@"(http[s]?://\S+|www\.\S+|\w+\.\w+/\S+)", RegexOptions.IgnoreCase);
                     textToTranslate = urlRegex.Replace(textToTranslate, m => {
                         string ph = $"___PH{pIndex++}___";
                         placeholders[ph] = m.Value;
@@ -150,7 +157,12 @@ namespace AllaganTranslator.Services
                     var customGlossaryRules = this.configuration.CustomGlossary.ToList();
                     foreach (var rule in customGlossaryRules)
                     {
-                        var regex = new Regex($@"\b{Regex.Escape(rule.Key)}\b", RegexOptions.IgnoreCase);
+                        if (!this.glossaryRegexCache.TryGetValue(rule.Key, out var regex))
+                        {
+                            regex = new Regex($@"\b{Regex.Escape(rule.Key)}\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                            this.glossaryRegexCache[rule.Key] = regex;
+                        }
+
                         textToTranslate = regex.Replace(textToTranslate, m => {
                             string ph = $"___PH{pIndex++}___";
                             placeholders[ph] = rule.Value;
@@ -161,7 +173,12 @@ namespace AllaganTranslator.Services
                     var foundLumina = this.luminaContextTerms.Where(t => textToTranslate.Contains(t, StringComparison.OrdinalIgnoreCase)).ToList();
                     foreach (var term in foundLumina)
                     {
-                        var regex = new Regex($@"\b{Regex.Escape(term)}\b", RegexOptions.IgnoreCase);
+                        if (!this.luminaRegexCache.TryGetValue(term, out var regex))
+                        {
+                            regex = new Regex($@"\b{Regex.Escape(term)}\b", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+                            this.luminaRegexCache[term] = regex;
+                        }
+
                         textToTranslate = regex.Replace(textToTranslate, m => {
                             string ph = $"___PH{pIndex++}___";
                             placeholders[ph] = m.Value;

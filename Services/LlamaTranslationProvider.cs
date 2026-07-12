@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Dalamud.Plugin.Services;
@@ -78,19 +79,20 @@ namespace AllaganTranslator.Services
             
             try
             {
-                // In un futuro si potrebbe rendere dinamica la lingua target nel prompt
-                var prompt = $"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are an expert professional localization translator for Final Fantasy XIV. Translate the following text into Italian. Maintain a natural, fluid, and colloquial tone suitable for a fantasy RPG. Do NOT translate idioms literally, adapt them to natural Italian equivalents. Output ONLY the final Italian translation without any explanations, quotes, or additional text.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{text}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
+                // Prompt dinamico con il targetLanguage corretto
+                var prompt = $"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\nYou are an expert professional localization translator for Final Fantasy XIV. Translate the following text into {targetLanguage}. Maintain a natural, fluid, and colloquial tone suitable for a fantasy RPG. Do NOT translate idioms literally, adapt them to natural {targetLanguage} equivalents. Output ONLY the final translation without any explanations, quotes, or additional text.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n{text}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n";
                 var inferenceParams = new InferenceParams() { 
                     MaxTokens = 256, 
                     AntiPrompts = new List<string> { "<|eot_id|>" }
                 };
 
-                string translatedText = "";
+                // Uso StringBuilder per evitare colli di bottiglia di memoria
+                StringBuilder sb = new StringBuilder();
                 await foreach (var tokenText in this.executor.InferAsync(prompt, inferenceParams, token))
                 {
-                    translatedText += tokenText;
+                    sb.Append(tokenText);
                 }
-                return translatedText;
+                return sb.ToString();
             }
             catch (OperationCanceledException)
             {
