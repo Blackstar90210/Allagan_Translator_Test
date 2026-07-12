@@ -1,4 +1,6 @@
 ## [1.0.0.18] - Refactoring Modelli & Download
+
+### 🇮🇹 Italiano
 - Rimosso completamente il supporto GPU/Vulkan a causa di instabilità con Dalamud
 - Declassato il modello Llama 3.1 8B a esecuzione esclusivamente CPU (AVX2)
 - Implementato un sistema di avvisi esplicito sul peso computazionale del modello 8B
@@ -10,3 +12,18 @@
 * **[Feature]** Mantenuto il modello leggero **Llama 3.2 3B** (su CPU) per computer meno performanti.
 * **[Miglioramento]** Nuove opzioni nel menù per lo switch a caldo tra IA Cloud e IA Locale CPU (3B o 8B).
 * **[Miglioramento]** Parametri di generazione ("Temperature" e "Top-P") ottimizzati per impedire all'IA di "inventare" frasi non presenti nell'originale.
+
+---
+
+### 🇬🇧 English
+- Completely removed GPU/Vulkan support due to instability issues with Dalamud
+- Downgraded the Llama 3.1 8B model to CPU-only execution (AVX2)
+- Implemented an explicit warning system regarding the computational weight of the 8B model
+- Added manual model download: files will no longer download in the background at startup, but will require explicit user action
+- Fixed a logic bug that prevented the correct loading of a new model if one was already previously loaded
+- Optimized `.zip` file size (discarded Vulkan libraries)
+- Performance optimization: StringBuilder for inference and pre-compiled Regex with caching
+
+* **[Feature]** Kept the lightweight **Llama 3.2 3B** model (on CPU) for less powerful computers.
+* **[Improvement]** New menu options for hot-swapping between Cloud AI and Local CPU AI (3B or 8B).
+* **[Improvement]** Generation parameters ("Temperature" and "Top-P") optimized to prevent the AI from "inventing" phrases not present in the original text.
