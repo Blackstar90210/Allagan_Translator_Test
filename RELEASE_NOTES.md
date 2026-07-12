@@ -1,4 +1,4 @@
-## [1.0.0.17] - Refactoring Modelli & Download
+## [1.0.0.18] - Refactoring Modelli & Download
 - Rimosso completamente il supporto GPU/Vulkan a causa di instabilità con Dalamud
 - Declassato il modello Llama 3.1 8B a esecuzione esclusivamente CPU (AVX2)
 - Implementato un sistema di avvisi esplicito sul peso computazionale del modello 8B
