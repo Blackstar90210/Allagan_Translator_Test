@@ -37,7 +37,7 @@ jobs:
           # Inietta l'icona
           Add-Type -AssemblyName System.IO.Compression.FileSystem
           $zip = [System.IO.Compression.ZipFile]::Open("latest.zip", 'Update')
-          [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, "images/icon.png", "icon.png")
+          [System.IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, "icon.png", "images/icon.png")
           $zip.Dispose()
           
           # Crea la copia per il testing
